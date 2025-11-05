@@ -87,6 +87,23 @@ Run BOTH agents simultaneously:
 }
 ```
 
+**CRITICAL FIX FOR IMAGE UPLOADS:**
+The inteles-image-curator MUST use ALL 5 required parameters for create_media:
+```python
+inteles_wordpress_create_media(
+    title="Image Title",
+    alt_text="Alt text (50-125 chars)",
+    caption="Romanian caption",
+    description="Description for WordPress media",
+    source_url="file://absolute/path/to/image.webp"
+)
+```
+
+**If create_media fails with "Nicio dispoziție de conținut furnizată":**
+- Check that ALL 5 parameters are included
+- Ensure source_url uses absolute path with file:// protocol
+- Verify image file exists and is accessible
+
 **Product Finder:**
 ```json
 {
@@ -133,9 +150,20 @@ inteles-wordpress - get_content_by_slug(slug: "article-slug", content_type: "pos
   },
   "update_existing": false,
   "post_id": null,
-  "preferred_content_type": "post"
+  "preferred_content_type": "post",
+  "html_format": "clean"  # NEW: Use clean, semantic HTML instead of complex Kadence blocks
 }
 ```
+
+**ENHANCED WORDPRESS PUBLISHER REQUIREMENTS:**
+The wordpress-publisher agent MUST generate:
+- ✅ **Clean semantic HTML5** (article, section, header, main, footer)
+- ✅ **Mobile-first responsive design**
+- ✅ **Minimal CSS classes** (no excessive Kadence bloating)
+- ✅ **Proper image optimization** (lazy loading, alt text, captions)
+- ✅ **Semantic content structure** (logical hierarchy, accessibility)
+- ✅ **SEO optimized markup** (proper heading structure, meta tags)
+- ❌ **Avoid**: Complex nested divs, hardcoded IDs, excessive CSS classes
 
 ---
 
@@ -145,6 +173,11 @@ inteles-wordpress - get_content_by_slug(slug: "article-slug", content_type: "pos
 - **Pexels MCP Down**: Use local image library
 - **WordPress Upload Fails**: Queue images for manual upload, proceed with article
 - **Partial Upload Success**: Use available images, mark missing ones for later
+- **"Nicio dispoziție de conținut furnizată" Error**:
+  - Missing description parameter in create_media call
+  - Wrong file path format (must use absolute path with file://)
+  - Image file doesn't exist at specified path
+  - MCP server requires all 5 parameters: title, alt_text, caption, description, source_url
 
 ### Product Finder Failures
 - **CSV File Missing**: Proceed without products
